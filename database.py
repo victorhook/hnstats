@@ -24,14 +24,24 @@ class Database:
         cursor = self.con.cursor()
         sample_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-        for post in posts:
-            cursor.execute(
-                f'INSERT INTO Post values (?, ?, ?, ?, ?, ?, ?, ?)',
-                (sample_time,post.rank, post.title, post.site, post.score,
-                 post.user, post.age, post.comments)
-            )
+        saved = 0
+
+        while saved < len(posts):
+            try:
+                self._save_post(cursor, posts[saved], sample_time)
+                saved += 1
+            except sqlite3.OperationalError:
+                print('Found no previous tables, creating new one...')
+                self.init_db()
 
         self.con.commit()
+
+    def _save_post(self, cursor, post: Post, sample_time: str):
+        cursor.execute(
+            f'INSERT INTO Post values (?, ?, ?, ?, ?, ?, ?, ?)',
+            (sample_time,post.rank, post.title, post.site, post.score,
+            post.user, post.age, post.comments)
+        )
 
     def init_db(self):
         cursor = self.con.cursor()
