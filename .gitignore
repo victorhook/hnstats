@@ -1,0 +1,4 @@
+__pycache__/
+hnstats.db
+env/
+.vscode/
