@@ -7,6 +7,9 @@ from post import Post
 
 class Database:
 
+    def __init__(self, db_path: str = 'hnstats.db'):
+        self.db_path = db_path
+
     def __enter__(self):
         self.open()
         return self
@@ -15,7 +18,7 @@ class Database:
         self.close()
 
     def open(self):
-        self.con = sqlite3.connect('hnstats.db')
+        self.con = sqlite3.connect(self.db_path)
 
     def close(self):
         self.con.close()
@@ -36,10 +39,16 @@ class Database:
 
         self.con.commit()
 
+    def fetch(self, amount: int = None) -> List[Post]:
+        cursor = self.con.cursor()
+        results = cursor.execute('Select * from Post;').fetchall()
+        posts = [Post(*res[1:]) for res in results]
+        return posts
+
     def _save_post(self, cursor, post: Post, sample_time: str):
         cursor.execute(
-            f'INSERT INTO Post values (?, ?, ?, ?, ?, ?, ?, ?)',
-            (sample_time,post.rank, post.title, post.site, post.score,
+            f'INSERT INTO Post values (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            (sample_time,post.rank, post.url, post.title, post.site, post.score,
             post.user, post.age, post.comments)
         )
 
@@ -50,6 +59,7 @@ class Database:
             (
                 sample_time DATETIME,
                 rank INT,
+                url VARCHAR(255),
                 title VARCHAR(255),
                 site VARCHAR(255),
                 score INT,
@@ -60,3 +70,7 @@ class Database:
         """)
         self.con.commit()
 
+if __name__ == '__main__':
+    with Database() as db:
+        posts = db.fetch(1)
+        print(posts)

@@ -86,7 +86,7 @@ class PostParser:
     @classmethod
     def _create_post(cls, attribute):
         rank, title, site, score, user, age, comment = attribute
-        post = Post(rank=rank.text[:-1])
+        post = Post(rank=rank.text[:-1], url=title['href'])
         cls._add_attribute(post, 'title', title)
         cls._add_attribute(post, 'site', site)
         cls._add_attribute(post, 'score', score)
