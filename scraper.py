@@ -92,10 +92,17 @@ class PostParser:
         cls._add_attribute(post, 'score', score)
         cls._add_attribute(post, 'user', user)
         cls._add_attribute(post, 'age', age)
-        cls._add_attribute(post, 'comment', comment)
+        cls._add_attribute(post, 'comments', comment)
         cls._parse_age(post)
         cls._parse_score(post)
+
+        try:
+            post.comments = int(post.comments.split('\xa0')[0])
+        except:
+            post.comments = 0
+
         return post
+        
 
     @classmethod
     def _add_attribute(cls, post, attribute_name, attribute):
